@@ -116,7 +116,7 @@ tbody tr:hover {
   width: 6.1rem;
   height: 6.1rem;
   border-radius: 1.02rem;
-  background: linear-gradient(135deg, var(--brand), #9fb4ff);
+  /* background: linear-gradient(135deg, var(--brand), #9fb4ff); */
   box-shadow: var(--shadow);
 }
 

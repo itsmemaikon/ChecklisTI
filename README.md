@@ -109,6 +109,8 @@ Para testar localmente:
 - Ajuste as variáveis do `.env` de acordo com seu ambiente.  
 - O backend usa `mssql` e parâmetros preparados para segurança.
 
+---
+
 ### ▶️ Como executar `schema.sql`
 - Abra o SQL Server Management Studio (SSMS).  
 - Conecte ao seu servidor.  
