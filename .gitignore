@@ -1,0 +1,25 @@
+# --- Dependências Node ---
+src/backend/node_modules/
+
+# --- Logs ---
+*.log
+src/backend/npm-debug.log*
+src/backend/yarn-debug.log*
+src/backend/yarn-error.log*
+src/backend/pnpm-debug.log*
+
+# --- Ambiente ---
+src/backend/.env
+src/backend/.env.local
+src/backend/.env.*.local
+
+# --- Build / Distribuição ---
+dist/
+build/
+coverage/
+
+# --- Sistema / IDE ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

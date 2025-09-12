@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ChecklisTI</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- Container Principal -->
+    <div class="container">
+      <header class="header">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <img src="./assets/logo.png" alt="" />
+          </div>
+          <div>
+            <h1>ChecklisTI</h1>
+            <p>Status seguro, gestão eficiente.</p>
+          </div>
+        </div>
+        <div class="toolbar">
+          <div class="toolbar-bottons">
+            <button class="btn" id="btnExport">Exportar CSV</button>
+            <button class="btn" id="btnPrint">Imprimir/PDF</button>
+            <button class="btn" id="btnSystem">Sistemas</button>
+            <button class="btn" id="btnAgent">Agentes</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="checklist" aria-labelledby="tblTitle">
+          <div class="checklist-header">
+            <div class="checklist-header-1">
+              <h3>Checklist</h3>
+              <div class="checklist-button">
+                <input class="btn" id="date" type="date" aria-label="Data" />
+                <button class="btn" id="btnSave">Salvar</button>
+              </div>
+            </div>
+            <div style="align-self: center">
+              <div class="checklist-badge" id="summary"></div>
+            </div>
+          </div>
+          <div class="checklist-content">
+            <table id="table">
+              <thead>
+                <tr>
+                  <th>Sistema</th>
+                  <th>Agente</th>
+                  <th>Status</th>
+                  <th>Observações</th>
+                  <th>Última verificação</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <div class="checklist-footer">
+            <button class="btn ok" id="btnAllOk">Todos Online</button>
+            <button class="btn warn" id="btnAllWarn">Todos Instável</button>
+            <button class="btn down" id="btnAllDown">Todos Offline</button>
+            <button class="btn maint" id="btnAllMaint">Todos Manutenção</button>
+            <button class="btn unknown" id="btnAllUnknown">
+              Todos Desconhecido
+            </button>
+          </div>
+        </div>
+
+        <aside class="history" aria-labelledby="histTitle">
+          <div class="history-header">
+            <h3>Histórico</h3>
+          </div>
+          <div class="history-content" id="history"></div>
+          <div class="history-footer">
+            <button class="btn" id="btnExportAll">Exportar CSV</button>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="footer">
+        © 2025 ChecklisTI. Todos os direitos reservados.
+      </footer>
+    </div>
+
+    <!-- Modal Gerenciar Sistemas -->
+    <dialog id="modalSystem" class="modal">
+      <form method="dialog">
+        <div class="modal-header">
+          <strong>Gerenciar sistemas</strong>
+          <div class="modal-header-bottons">
+            <button class="btn" value="ok" id="saveSystemsBtn">
+              Salvar alterações
+            </button>
+            <button class="btn ghost" value="cancel">Fechar</button>
+          </div>
+        </div>
+        <div class="modal-content">
+          <div class="modal-content-bottons">
+            <input
+              id="newSystemInput"
+              type="text"
+              class="btn note"
+              placeholder="Nome do sistema"
+            />
+            <button type="button" class="btn" id="addSystem">Adicionar</button>
+          </div>
+          <div id="systemsList"></div>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Modal Gerenciar Agentes -->
+    <dialog id="modalAgent" class="modal">
+      <form method="dialog">
+        <div class="modal-header">
+          <strong>Gerenciar Agentes</strong>
+          <div class="modal-header-bottons">
+            <button class="btn" value="ok" id="saveAgentsBtn">
+              Salvar alterações
+            </button>
+            <button class="btn ghost" value="cancel">Fechar</button>
+          </div>
+        </div>
+        <div class="modal-content">
+          <div class="modal-content-bottons">
+            <input
+              id="newAgentInput"
+              type="text"
+              class="btn note"
+              placeholder="Nome do agente"
+            />
+            <button type="button" class="btn" id="addAgent">Adicionar</button>
+          </div>
+          <div id="agentsList"></div>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
