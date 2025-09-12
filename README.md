@@ -1,3 +1,7 @@
+<img src="src/frontend/assets/logo-sem-fundo.png" alt="Logo" width="250" height="250"/>
+
+---
+
 # ✅ ChecklisTI
 
 ![Node.js](https://img.shields.io/badge/Node.js-18+-green)
