@@ -17,6 +17,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
+global.db = require('./db');
+
 // Rotas da API
 app.use("/api/systems", systemsRoutes);
 app.use("/api/agents", agentsRoutes);
