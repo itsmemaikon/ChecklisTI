@@ -6,16 +6,16 @@ router.get("/:date", async (req, res) => {
   const date = req.params.date;
   try {
     const chk = await global.db.listChecklistFromDate(date);
-
-    if (chk.recordset.length === 0) {
+    
+    if (!chk || chk.length === 0) {
       return res.json(null);
     }
 
-    const row = chk.recordset[0];
+    const row = chk[0];
     const items = await global.db.listChecklistItems(row.id);
-
     const itemsMap = {};
-    for (const it of items.recordset) {
+
+    for (const it of items) {
       itemsMap[it.system_id] = {
         agent: it.agent_id,
         status: it.status,
@@ -48,18 +48,16 @@ router.post("/", async (req, res) => {
 
     // Verifica se já existe checklist pra data
     const existing = await global.db.listChecklistFromDate(data.date);
-
+    
     let checklistId;
-    if (existing.recordset.length) {
-      checklistId = existing.recordset[0].id;
-
-      let modifydatechecklist = await global.db.updateChecklistSaveAt(checklistId);
-      let deletechecklist = await global.db.daleteChecklistItems(checklistId);
+    if (existing && existing.length > 0) {
+      checklistId = existing[0].id;
+      
+      await global.db.updateChecklistSaveAt(checklistId);
+      await global.db.deleteChecklistItems(checklistId);
 
     } else {
       const ins = await global.db.insertChecklist(data.date);
-
-      checklistId = ins.recordset[0].id;
     }
 
     for (const [systemId, rec] of Object.entries(data.items || {})) {
@@ -68,7 +66,14 @@ router.post("/", async (req, res) => {
       let status     = rec.status || "unknown";
       let note       = rec.note || null;
       let last_check = rec.time || null;
-      let insertChecklistItem = await global.db.insertChecklistItems([checklistId, system_idd, agent_id, status, note, last_check]);
+      let insertChecklistItem = await global.db.insertChecklistItems({
+                                        checklist_id: checklistId,
+                                        system_id: system_idd,
+                                        agent_id: agent_id,
+                                        status: status,
+                                        note: note,
+                                        last_check: last_check
+                                      });
     };
     res.json({ ok: true });
   } catch (err) {
@@ -80,9 +85,9 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const rows = await global.db.listChecklists();
-
     const out = [];
-    for (const r of rows.recordset) {
+
+    for (const r of rows) {
       const counts = await global.db.listChecklistsStatusCount(r.id);
 
       const obj = {
@@ -96,7 +101,7 @@ router.get("/", async (req, res) => {
         },
       };
 
-      for (const c of counts.recordset) {
+      for (const c of counts) {
         obj.counts[c.status] = c.cnt;
       }
 

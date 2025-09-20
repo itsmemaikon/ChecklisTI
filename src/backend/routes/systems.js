@@ -5,7 +5,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const result = await global.db.listActiveSystems();
-    res.json(result.recordset);
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

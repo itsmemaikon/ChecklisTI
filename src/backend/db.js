@@ -80,14 +80,14 @@ async function listChecklistItems(id) {
 async function updateChecklistSaveAt(id) {
     const conexao = await conectarBD();
     const sql = `UPDATE checklists SET saved_at = CURRENT_TIMESTAMP(6) WHERE id = ?`;
-    const [resultado] = await conexao.query(sql, id);
+    const [resultado] = await conexao.query(sql, [id]);
     return resultado;
 }
 
-async function daleteChecklistItems(id) {
+async function deleteChecklistItems(id) {
     const conexao = await conectarBD();
     const sql = `DELETE FROM checklist_items WHERE checklist_id=?`;
-    const [resultado] = await conexao.query(sql, id);
+    const [resultado] = await conexao.query(sql, [id]);
     return resultado;
 }
 
@@ -95,18 +95,26 @@ async function insertChecklist(date) {
     const conexao = await conectarBD();
     const sql = `INSERT INTO checklists (check_date) VALUES (?);`;
     const [resultado] = await conexao.query(sql, [date]);
-    return resultado;
+    return resultado.insertId;
 }
 
-async function insertChecklistItems(checklistItem) {
-    const conexao = await conectarBD();
-    const sql = `INSERT INTO dbo.checklist_items 
-            (checklist_id, system_id, agent_id, status, note, last_check) 
-          VALUES 
-            (?, ?,?, ?, ?, ?);`;
-    const [resultado] = await conexao.query(sql, [checklistItem.checklistId, checklistItem.system_idd, checklistItem.agent_id, checklistItem.status, checklistItem.note, checklistItem.last_check]);
-    return resultado;
+async function insertChecklistItems(item) {
+  console.log(item);
+  const conexao = await conectarBD();
+  const sql = `INSERT INTO checklist_items 
+               (checklist_id, system_id, agent_id, status, note, last_check) 
+               VALUES (?, ?, ?, ?, ?, ?)`;
+  const [resultado] = await conexao.query(sql, [
+    item.checklist_id,
+    item.system_id,
+    item.agent_id,
+    item.status,
+    item.note,
+    item.last_check
+  ]);
+  return resultado.insertId;
 }
+
 
 async function listChecklists() {
     const conexao = await conectarBD();
@@ -117,7 +125,7 @@ async function listChecklists() {
 
 async function listChecklistsStatusCount(id) {
     const conexao = await conectarBD();
-    const sql = `SELECT status, COUNT(*) as cnt FROM dbo.checklist_items WHERE checklist_id=? GROUP BY status`;
+    const sql = `SELECT status, COUNT(*) as cnt FROM checklist_items WHERE checklist_id=? GROUP BY status`;
     const [resultado] = await conexao.query(sql, [id]);
     return resultado;  
 }
@@ -153,7 +161,7 @@ async function insertSystem(name) {
 
 async function inativateAllSystems() {
   const conexao = await conectarBD();
-  const sql = `UPDATE dbo.systems SET is_active = 0 WHERE is_active = 1`;
+  const sql = `UPDATE systems SET is_active = 0 WHERE is_active = 1`;
   const [resultado] = await conexao.query(sql); 
   return resultado;
 }
@@ -179,7 +187,7 @@ module.exports = {
                    listChecklistFromDate,
                    listChecklistItems,
                    updateChecklistSaveAt,
-                   daleteChecklistItems,
+                   deleteChecklistItems,
                    insertChecklist,
                    insertChecklistItems,
                    listChecklists,
