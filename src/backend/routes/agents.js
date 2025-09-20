@@ -14,18 +14,15 @@ router.get("/", async (req, res) => {
 // PUT - atualizar lista de agentes (mantém histórico com is_active)
 router.put("/", async (req, res) => {
   const agents = req.body;
+  console.log(agents);
 
   if (!Array.isArray(agents)) {
     return res.status(400).json({ error: "Array esperado [{id,name}, ...]" });
   }
 
-  const pool = await getPool();
-  const tx = new sql.Transaction(pool);
-
   try {
     // pega tudo que já existe no banco
-    const existingRes = await global.db.listActiveAgents();
-    const existing = existingRes.recordset || [];
+    const existing = await global.db.listActiveAgents();
 
     const existingById = Object.fromEntries(existing.map((s) => [s.id, s]));
     const existingByName = Object.fromEntries(existing.map((s) => [s.name, s]));
@@ -56,13 +53,10 @@ router.put("/", async (req, res) => {
         // Atualiza nome se mudou e garante ativo
         idsInPayload.push(id);
         let updateAgentName = await global.db.attAgentName(id, rawName);
-
-        console.log(updateAgentName);
-
+        console.log(id, rawName);
       } else if (!id) {
         // Insere novo e pega o id inserido
         const insertRes = await global.db.insertAgent(rawName);
-        console.log(insertRes);
         const newId = insertRes.insertId;
         if (newId) idsInPayload.push(newId);
       } else {
@@ -70,8 +64,6 @@ router.put("/", async (req, res) => {
         console.warn(
           `ID ${id} não encontrado no banco — ignorando (name=${rawName}).`
         );
-        // opcional: você pode lançar erro aqui se preferir:
-        // throw new Error(`ID ${id} não existe`);
       }
     }
 
@@ -80,6 +72,7 @@ router.put("/", async (req, res) => {
       await global.db.desativateAgents();
     } else {
       await global.db.inativateAgents(idsInPayload);
+      console.log(idsInPayload);
     }
 
     res.json({ ok: true });

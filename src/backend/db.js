@@ -35,14 +35,14 @@ async function listActiveAgents() {
 async function attAgentName(id, name) {
     const conexao = await conectarBD();
     const sql = `UPDATE agents SET name = ? WHERE id = ?`;
-    const [resultado] = await conexao.query(sql, [id, name]);
+    const [resultado] = await conexao.query(sql, [name, id]);
     return resultado;
 }
 
-async function insertAgent(usuario) {
+async function insertAgent(nome) {
     const conexao = await conectarBD();
     const sql = `INSERT INTO agents (name, is_active) VALUES (?, 1)`;
-    const [resultado] = await conexao.query(sql, [usuario.nome]);
+    const [resultado] = await conexao.query(sql, [nome]);
     return resultado;  // retorna o id do registro inserido
 }
 
@@ -53,17 +53,13 @@ async function desativateAgents() {
     return resultado;
 }
 
-async function inativateAgents(idsInPayload) {
-    if (!Array.isArray(idsInPayload) || idsInPayload.length === 0) {
-        return { affectedRows: 0 };
-    }
-
-    const conexao = await conectarBD();
-    const placeholders = idsInPayload.map(() => "?").join(","); // ?,?,?
-    const sql = `UPDATE agents SET is_active = 0 WHERE id NOT IN (${placeholders}) AND is_active = 1`;
-    const [resultado] = await conexao.query(sql, idsInPayload);
-    return resultado;
+async function inativateAgents(ids) {
+  const conexao = await conectarBD();
+  const sql = `UPDATE agents SET is_active = 0 WHERE id NOT IN (${ids.join(",")}) AND is_active = 1`;
+  const [resultado] = await conexao.query(sql); 
+  return resultado;
 }
+
 
 
 module.exports = { listAgents,listActiveAgents, attAgentName, insertAgent, desativateAgents, inativateAgents };
