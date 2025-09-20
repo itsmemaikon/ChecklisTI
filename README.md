@@ -11,46 +11,45 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-yellow)
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
 
-O **ChecklisTI** é uma aplicação web voltada para o **controle, acompanhamento e gestão do status de sistemas de TI** em empresas de qualquer porte.  
+O **ChecklisTI** é uma aplicação web para **controle, acompanhamento e gestão do status de sistemas de TI** em empresas de qualquer porte.  
 
-Com o suporte a **Docker**, a aplicação pode ser executada em qualquer ambiente com um único comando, sem necessidade de configurar manualmente banco de dados ou dependências.
+Com suporte a **Docker**, a aplicação pode ser executada em qualquer ambiente com um único comando, sem necessidade de configurar manualmente banco de dados ou dependências.
 
 ---
 
 ## 📂 Estrutura do Projeto
 
+```
 src/
-├─ backend/ # API Node.js + Express
-│ ├─ db.js # Conexão com o banco de dados
-│ ├─ package.json # Dependências do backend
-│ ├─ schema.sql # Script SQL para criar banco e tabelas
-│ ├─ server.js # Ponto de entrada do servidor Node.js
-│ ├─ routes/ # Rotas da API
-│ └─ utils/ # Funções auxiliares
-└─ frontend/ # Interface do usuário (HTML/CSS/JS)
-├─ assets/ # Arquivos estáticos
-├─ index.html # Página principal
-├─ script.js # Scripts JavaScript
-└─ style.css # Estilos CSS
-
-yaml
-Copy code
+├─ backend/            # API Node.js + Express
+│  ├─ db.js            # Conexão com o banco de dados
+│  ├─ package.json     # Dependências do backend
+│  ├─ schema.sql       # Script SQL para criar banco e tabelas
+│  ├─ server.js        # Ponto de entrada do servidor Node.js
+│  ├─ routes/          # Rotas da API
+│  └─ utils/           # Funções auxiliares
+└─ frontend/           # Interface do usuário (HTML/CSS/JS)
+   ├─ assets/          # Arquivos estáticos
+   ├─ index.html       # Página principal
+   ├─ script.js        # Scripts JavaScript
+   └─ style.css        # Estilos CSS
+```
 
 ---
 
 ## 🚀 Tecnologias Principais
 
-- **Backend:** Node.js, Express  
+- **Backend:** Node.js + Express  
 - **Frontend:** HTML5, CSS3, JavaScript (VanillaJS)  
-- **Banco:** MariaDB 11  
-- **Outros:** Docker & Docker Compose  
+- **Banco de Dados:** MariaDB 11  
+- **Infra:** Docker & Docker Compose  
 
 ---
 
 ## 🔧 Pré-requisitos
 
-- [Docker](https://docs.docker.com/get-docker/) instalado  
-- [Docker Compose](https://docs.docker.com/compose/) instalado  
+- [Docker](https://docs.docker.com/get-docker/)  
+- [Docker Compose](https://docs.docker.com/compose/)  
 
 ---
 
@@ -60,69 +59,64 @@ Copy code
    ```bash
    git clone https://github.com/itsmemaikon/ChecklisTI.git
    cd ChecklisTI
-Suba os containers:
+   ```
 
-bash
-Copy code
-docker-compose up --build
-Isso irá:
+2. **Suba os containers**:
+   ```bash
+   docker-compose up --build
+   ```
 
-Criar e iniciar um container MariaDB com usuário, senha e banco definidos.
+   Isso irá:  
+   - Criar e iniciar um container **MariaDB** com usuário, senha e banco definidos.  
+   - Executar automaticamente o script `schema.sql` (apenas na primeira execução).  
+   - Construir e rodar o container do **backend Node.js**.  
+   - Servir o **frontend estático**.  
 
-Executar automaticamente o script schema.sql para criar as tabelas (apenas na primeira execução).
+3. **Acesse a aplicação**:  
+   - Backend (API): [http://localhost:3000](http://localhost:3000/api)  
+   - Frontend: [http://localhost:3000](http://localhost:3000)  
 
-Construir e rodar o container do backend Node.js.
+---
 
-Servir o frontend estático.
+## 🗄️ Banco de Dados
 
-Acesse a aplicação:
+O banco roda dentro do container `checklistti_db`.  
 
-Backend (API): http://localhost:3000
+**Configurações padrão** (definidas em `docker-compose.yml`):  
+- **Host:** `db` (interno ao Docker) ou `localhost:3306` (externo)  
+- **Database:** `ChecklisTI`  
+- **User:** `checklistti_user`  
+- **Password:** `checklistti_pass`  
+- **Root password:** `rootpassword`  
 
-Frontend: http://localhost:3000
-
-🗄️ Banco de Dados
-O banco roda dentro do container checklistti_db.
-
-Configurações padrão (definidas no docker-compose.yml):
-
-Host: db (interno ao Docker) ou localhost:3306 (externo)
-
-Database: ChecklisTI
-
-User: checklistti_user
-
-Password: checklistti_pass
-
-Root password: rootpassword
-
-Os dados são persistidos em um volume Docker chamado mariadb_data, portanto não serão perdidos ao reiniciar os containers.
+Os dados são persistidos em um volume Docker chamado `mariadb_data`, não sendo perdidos ao reiniciar os containers.  
 
 Para acessar o banco via terminal:
-
-bash
-Copy code
+```bash
 docker exec -it checklistti_db mariadb -u checklistti_user -pChecklisTI
-📝 Fluxo de Desenvolvimento com Docker
-Clone o repositório.
+```
 
-Rode docker-compose up --build.
+---
 
-Acesse a aplicação em http://localhost:3000.
+## 📝 Fluxo de Desenvolvimento com Docker
 
-Edite o código no host → o backend será reconstruído automaticamente no próximo build.
+1. Clone o repositório.  
+2. Rode `docker-compose up --build`.  
+3. Acesse a aplicação em [http://localhost:3000](http://localhost:3000).  
+4. Edite o código no host → as mudanças refletem no próximo build.  
 
-Para parar os containers:
-
-bash
-Copy code
+### Parar os containers:
+```bash
 docker-compose down
-Para parar e apagar os dados do banco:
+```
 
-bash
-Copy code
+### Parar e apagar os dados do banco:
+```bash
 docker-compose down -v
+```
 
-🗂️ Licença
+---
+
+## 🗂️ Licença
 
 © 2025 ChecklisTI. Todos os direitos reservados.
