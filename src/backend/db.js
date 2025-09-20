@@ -72,8 +72,8 @@ async function listChecklistFromDate(date) {
 
 async function listChecklistItems(id) {
     const conexao = await conectarBD();
-    const sql = `SELECT ci.*, s.name as system_name_db FROM checklist_items ci LEFT JOIN systems s ON system_id = s.id WHERE ci.checklist_id = @id`;
-    const [resultado] = await conexao.query(sql, [date]);
+    const sql = `SELECT ci.*, s.name as system_name_db FROM checklist_items ci LEFT JOIN systems s ON system_id = s.id WHERE ci.checklist_id = ?`;
+    const [resultado] = await conexao.query(sql, [id]);
     return resultado;  
 }
 
@@ -115,11 +115,55 @@ async function listChecklists() {
     return resultado;  
 }
 
-async function listChecklistsStatusCount() {
+async function listChecklistsStatusCount(id) {
     const conexao = await conectarBD();
-    const sql = `SELECT id, check_date FROM checklists ORDER BY check_date ASC`;
+    const sql = `SELECT status, COUNT(*) as cnt FROM dbo.checklist_items WHERE checklist_id=? GROUP BY status`;
+    const [resultado] = await conexao.query(sql, [id]);
+    return resultado;  
+}
+
+//SYSTEMS
+async function listActiveSystems() {
+    const conexao = await conectarBD();
+    const sql = `SELECT id, name FROM systems WHERE is_active = 1 ORDER BY id`;
     const [resultado] = await conexao.query(sql);
     return resultado;  
+}
+
+async function listSystems() {
+    const conexao = await conectarBD();
+    const sql = `SELECT id, name, is_active FROM systems`;
+    const [resultado] = await conexao.query(sql);
+    return resultado;  
+}
+
+async function updateSystemName(system) {
+    const conexao = await conectarBD();
+    const sql = `UPDATE systems SET name=?, is_active=1 WHERE id=?`;
+    const [resultado] = await conexao.query(sql, system.rawName, system.id);
+    return resultado;
+}
+
+async function insertSystem(name) {
+    const conexao = await conectarBD();
+    const sql = `INSERT INTO systems (name, is_active) VALUES (?, 1);`;
+    const [resultado] = await conexao.query(sql, [name]);
+    return resultado;
+}
+
+async function inativateAllSystems() {
+  const conexao = await conectarBD();
+  const sql = `UPDATE dbo.systems SET is_active = 0 WHERE is_active = 1`;
+  const [resultado] = await conexao.query(sql); 
+  return resultado;
+}
+
+//needs a little look to that query
+async function inativateSystems(ids) {
+  const conexao = await conectarBD();
+  const sql = `UPDATE systems SET is_active = 0 WHERE id NOT IN (${ids.join(",")}) AND is_active = 1`;
+  const [resultado] = await conexao.query(sql); 
+  return resultado;
 }
 
 module.exports = { 
@@ -139,5 +183,13 @@ module.exports = {
                    insertChecklist,
                    insertChecklistItems,
                    listChecklists,
-                   listChecklistsStatusCount
+                   listChecklistsStatusCount,
+
+                   //Systems
+                   listActiveSystems,
+                   listSystems,
+                   updateSystemName,
+                   insertSystem,
+                   inativateAllSystems,
+                   inativateSystems
                  };
