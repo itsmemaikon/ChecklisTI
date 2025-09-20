@@ -2,7 +2,7 @@
 
 ---
 
-# ✅ ChecklisTI (Dockerized)
+# ✅ ChecklisTI
 
 ![Node.js](https://img.shields.io/badge/Node.js-18+-green)
 ![MariaDB](https://img.shields.io/badge/MariaDB-11-blue)
