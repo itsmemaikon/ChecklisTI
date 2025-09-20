@@ -174,6 +174,35 @@ async function inativateSystems(ids) {
   return resultado;
 }
 
+//EXPORT
+async function listChecklistsbyDate(date) {
+    const conexao = await conectarBD();
+    const sql = `SELECT id FROM checklists WHERE check_date=?;`;
+    const [resultado] = await conexao.query(sql, [date]);
+    return resultado;
+}
+
+async function listItemsRes(id) {
+    const conexao = await conectarBD();
+    const sql = `SELECT ch.check_date, ag.name AS agent, sy.name AS system, status, note, last_check FROM checklist_items ci LEFT JOIN checklists ch ON ch.id = ci.checklist_id LEFT JOIN systems sy ON sy.id = ci.system_id LEFT JOIN agents ag ON ag.id = ci.agent_id WHERE checklist_id=?`;
+    const [resultado] = await conexao.query(sql, [id]);
+    return resultado;
+}
+
+async function listChecklistsbyId() {
+    const conexao = await conectarBD();
+    const sql = `SELECT id FROM dbo.checklists`;
+    const [resultado] = await conexao.query(sql);
+    return resultado;
+}
+
+async function listMultiple(id) {
+    const conexao = await conectarBD();
+    const sql = `SELECT ch.check_date, ag.name AS agent, sy.name AS system, status, note, last_check FROM checklist_items ci LEFT JOIN checklists ch ON ch.id = ci.checklist_id LEFT JOIN systems sy ON sy.id = ci.system_id LEFT JOIN agents ag ON ag.id = ci.agent_id WHERE checklist_id=?`;
+    const [resultado] = await conexao.query(sql, [id]);
+    return resultado;
+}
+
 module.exports = { 
                    //Agents
                    listAgents, 
@@ -199,5 +228,11 @@ module.exports = {
                    updateSystemName,
                    insertSystem,
                    inativateAllSystems,
-                   inativateSystems
+                   inativateSystems,
+
+                   //Export
+                   listChecklistsbyDate,
+                   listItemsRes,
+                   listChecklistsbyId,
+                   listMultiple
                  };
