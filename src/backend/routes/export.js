@@ -1,18 +1,24 @@
 const express = require("express");
 const router = express.Router();
+const query = require("../utils/query");
 
-// GET - exportar checklist por data
 router.get("/:date", async (req, res) => {
-  const dateParam = req.params.date;
+  const date = req.params.date;
   try {
-    const recRes = await global.db.listChecklistsbyDate(dateParam);
+    const recRes = await query(
+      "SELECT id FROM dbo.checklists WHERE check_date=@date",
+      [{ name: "date", type: "Date", value: date }]
+    );
 
-    if (!recRes || recRes.length === 0) {
+    if (!recRes.recordset.length) {
       return res.status(404).json({ error: "Checklist não encontrado" });
     }
 
-    const rec = recRes[0];
-    const itemsRes = await global.db.listItemsRes(rec.id);
+    const rec = recRes.recordset[0];
+    const itemsRes = await query(
+      "SELECT ch.check_date, ag.name AS agent, sy.name AS system, status, note, last_check FROM dbo.checklist_items ci LEFT JOIN dbo.checklists ch ON ch.id = ci.checklist_id LEFT JOIN dbo.systems sy ON sy.id = ci.system_id LEFT JOIN dbo.agents ag ON ag.id = ci.agent_id WHERE checklist_id=@id",
+      [{ name: "id", type: "Int", value: rec.id }]
+    );
 
     const mapLabel = {
       online: "Online",
@@ -29,17 +35,13 @@ router.get("/:date", async (req, res) => {
         "Sistema",
         "Status",
         "Observações",
-        "Última Verificação",
+        "Ultima Verificação",
       ],
     ];
 
-    const checklistDate = rec.check_date
-      ? new Date(rec.check_date).toISOString().slice(0, 10)
-      : dateParam;
-
-    for (const it of itemsRes || []) {
+    for (const it of itemsRes.recordset) {
       rows.push([
-        checklistDate,
+        date,
         it.agent || "",
         it.system || "",
         mapLabel[it.status] || it.status,
@@ -55,23 +57,28 @@ router.get("/:date", async (req, res) => {
     res.setHeader("Content-Type", "text/csv;charset=utf-8");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="checklist_${checklistDate}.csv"`
+      `attachment; filename="checklist_${date}.csv"`
     );
     res.send(csv);
   } catch (err) {
-    console.error("Erro em GET /:date", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET - exportar todos os checklists
 router.get("/", async (req, res) => {
+  const date = req.params.date;
   try {
-    const recRes = await global.db.listChecklists();
+    const recRes = await query("SELECT id FROM dbo.checklists");
 
-    if (!recRes || recRes.length === 0) {
-      return res.status(404).json({ error: "Nenhum checklist encontrado" });
+    if (!recRes.recordset.length) {
+      return res.status(404).json({ error: "Checklist não encontrado" });
     }
+
+    const rec = recRes.recordset[0];
+    const itemsRes = await query(
+      "SELECT ch.check_date, ag.name AS agent, sy.name AS system, status, note, last_check FROM dbo.checklist_items ci LEFT JOIN dbo.checklists ch ON ch.id = ci.checklist_id LEFT JOIN dbo.systems sy ON sy.id = ci.system_id LEFT JOIN dbo.agents ag ON ag.id = ci.agent_id WHERE checklist_id=@id",
+      [{ name: "id", type: "Int", value: rec.id }]
+    );
 
     const mapLabel = {
       online: "Online",
@@ -88,26 +95,19 @@ router.get("/", async (req, res) => {
         "Sistema",
         "Status",
         "Observações",
-        "Última Verificação",
+        "Ultima Verificação",
       ],
     ];
 
-    for (const rec of recRes) {
-      const itemsRes = await global.db.listItemsRes(rec.id);
-      const checklistDate = rec.check_date
-        ? new Date(rec.check_date).toISOString().slice(0, 10)
-        : "";
-
-      for (const it of itemsRes || []) {
-        rows.push([
-          checklistDate,
-          it.agent || "",
-          it.system || "",
-          mapLabel[it.status] || it.status,
-          it.note || "",
-          it.last_check || "",
-        ]);
-      }
+    for (const it of itemsRes.recordset) {
+      rows.push([
+        date,
+        it.agent || "",
+        it.system || "",
+        mapLabel[it.status] || it.status,
+        it.note || "",
+        it.last_check || "",
+      ]);
     }
 
     const csv = rows
@@ -117,11 +117,10 @@ router.get("/", async (req, res) => {
     res.setHeader("Content-Type", "text/csv;charset=utf-8");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="checklists_export.csv"`
+      `attachment; filename="checklist_${date}.csv"`
     );
     res.send(csv);
   } catch (err) {
-    console.error("Erro em GET /", err);
     res.status(500).json({ error: err.message });
   }
 });

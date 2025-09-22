@@ -17,17 +17,16 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-global.db = require('./db');
-
 // Rotas da API
 app.use("/api/systems", systemsRoutes);
 app.use("/api/agents", agentsRoutes);
 app.use("/api/checklist", checklistRoutes);
 app.use("/api/export", exportRoutes);
 
-app.use(express.static(path.join(__dirname, 'frontend')));
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+// Servir frontend
+app.use(express.static(path.join(__dirname, "..", "frontend")));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "frontend", "index.html"));
 });
 
 // Start
