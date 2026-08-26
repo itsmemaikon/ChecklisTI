@@ -183,6 +183,15 @@ tbody tr:hover {
   gap: 0.65rem;
 }
 
+.checklist-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.02rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
 .checklist-content::-webkit-scrollbar {
   display: none;
 }
@@ -314,6 +323,23 @@ tbody tr:hover {
   border-radius: 9.54rem;
   font-size: 1.28rem;
   border: 1px solid var(--border);
+}
+
+.badge.filterable {
+  cursor: pointer;
+  user-select: none;
+  transition: 0.2s;
+}
+
+.badge.filterable:hover {
+  filter: brightness(1.2);
+  transform: translateY(-1px);
+}
+
+.badge.filterable.active {
+  border-color: var(--brand);
+  background: rgba(124, 156, 255, 0.18);
+  box-shadow: 0 0 0 1px var(--brand) inset;
 }
 
 .dot {
@@ -501,6 +527,11 @@ tbody tr:hover {
   .checklist-header-1,
   .checklist-button {
     flex-flow: column;
+  }
+
+  .checklist-summary {
+    flex-flow: column;
+    align-items: stretch;
   }
 
   .checklist-badge {
