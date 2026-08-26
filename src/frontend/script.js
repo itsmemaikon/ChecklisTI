@@ -12,6 +12,7 @@
     { key: "unknown", label: "Desconhecido", cls: "unknown" },
   ];
   const summaryEl = $("#summary");
+  const btnClearFilter = $("#btnClearFilter");
   const histEl = $("#history");
   const kpiOk = $("#kpi-ok");
   const kpiWarn = $("#kpi-warn");
@@ -28,6 +29,9 @@
   const addAgentBtn = $("#addAgent");
   const newAgentInput = $("#newAgentInput");
   const saveAgentsBtn = $("#saveAgentsBtn");
+
+  // Filtro ativo pelas badges de status (null = sem filtro, mostra tudo)
+  let activeFilter = null;
 
   // Funções Assincronas
   // Inicialização
@@ -403,7 +407,7 @@
     <!-- Select de agentes -->
     <td data-label="Agente">
       <select class="btn ghost agent-select" aria-label="Agente de ${
-        agents.name
+        system.name
       }" required>
         <option value="">Selecione um agente</option>
         ${agents
@@ -470,9 +474,29 @@
     const c = countStatus();
     const parts = STATUS.map((s) => {
       const n = c[s.key];
-      return `<span class="badge"><span class="dot ${s.cls}"></span>${s.label}: ${n}</span>`;
+      const activeCls = activeFilter === s.key ? " active" : "";
+      return `<span class="badge filterable${activeCls}" data-status="${s.key}"><span class="dot ${s.cls}"></span>${s.label}: ${n}</span>`;
     });
     summaryEl.innerHTML = parts.join(" ");
+    applyFilter();
+  }
+
+  // Filtrar as linhas da tabela conforme o status selecionado na badge
+  function applyFilter() {
+    $$("#tbody tr").forEach((tr) => {
+      if (!activeFilter) {
+        tr.style.display = "";
+        return;
+      }
+      const status = tr.querySelector(".status-select").value;
+      tr.style.display = status === activeFilter ? "" : "none";
+    });
+  }
+
+  // Alternar o filtro ao clicar em uma badge (clicar de novo remove o filtro)
+  function setFilter(status) {
+    activeFilter = activeFilter === status ? null : status;
+    updateSummary();
   }
 
   // Contar os status
@@ -556,6 +580,15 @@
   $("#btnAllDown").addEventListener("click", () => markAll("offline"));
   $("#btnAllMaint").addEventListener("click", () => markAll("maintenance"));
   $("#btnAllUnknown").addEventListener("click", () => markAll("unknown"));
+  summaryEl.addEventListener("click", (e) => {
+    const badge = e.target.closest(".badge[data-status]");
+    if (!badge) return;
+    setFilter(badge.dataset.status);
+  });
+  btnClearFilter.addEventListener("click", () => {
+    activeFilter = null;
+    updateSummary();
+  });
   btnSystem.addEventListener("click", openSystem);
   btnAgent.addEventListener("click", openAgent);
   addSystemBtn.addEventListener("click", () => {
